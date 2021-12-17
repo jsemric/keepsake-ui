@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container pull-left">
+    <h2>Experiment: {{ short_id }}</h2>
+    <table class="table table-bordered">
+        <tr>
+            <th>Created</th>
+            <td>{{ created }}</td>
+        </tr>
+        <tr>
+            <th>Command</th>
+            <td>{{ command }}</td>
+        </tr>
+        <tr>
+            <th>Parameters</th>
+        </tr>
+        {% for k, v in params.items() %}
+            <tr>
+                <td>{{ k }}</td>
+                <td>{{ v }}</td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <th>Metrics</th>
+        </tr>
+        {% for k, v in  metrics.items() %}
+            <tr>
+                <td>{{ k }}</td>
+                <td>{{ "%.2f"|format(v) }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
