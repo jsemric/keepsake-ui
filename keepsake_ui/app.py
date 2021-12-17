@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 class Project(keepsake.Project):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._daemon_start = None
@@ -43,6 +42,7 @@ def setup_keepsake_blueprint(project: Project):
             except Exception as e:
                 logger.error(str(e), exc_info=True)
                 return render_template("error.html", message=str(e), title="Error"), 404
+
         return wrapper
 
     @bp.route("/", methods=["GET"])
@@ -68,8 +68,9 @@ def setup_keepsake_blueprint(project: Project):
     @handle_error
     def list_experiments():
         experiments = project.experiments.list()
-        short_ids = sorted([(e.created.isoformat(), e.short_id())
-                            for e in experiments], reverse=True)
+        short_ids = sorted(
+            [(e.created.isoformat(), e.short_id()) for e in experiments], reverse=True
+        )
         return render_template("experiment_list.html", short_ids=short_ids)
 
     @bp.route("/error", methods=["GET"])

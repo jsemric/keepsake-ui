@@ -19,7 +19,7 @@ def experiment(repo):
         with open(path / "s.py", "w") as f:
             f.write("dsada")
         proj = keepsake.Project(repo, d)
-        exp = proj.experiments.create('.', params=dict(a=2))
+        exp = proj.experiments.create(".", params=dict(a=2))
 
         chkpt = path / "model"
         with open(chkpt, "w") as f:
