@@ -1,0 +1,46 @@
+name: CI Build
+
+on:
+  push:
+    branches:
+      - master
+
+  pull_request:
+    branches:
+      - master
+
+jobs:
+
+  static-checks:
+    timeout-minutes: 5
+    name: "Static checks"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        name: setup-python
+        with:
+          python-version: "3.9"
+          architecture: "x64"
+      - uses: pre-commit/action@v2.0.0
+
+  unit-tests:
+    timeout-minutes: 5
+    name: Unit-tests
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: "."
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        name: setup-python
+        with:
+          python-version: "3.9"
+          architecture: "x64"
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+      - name: Run pytest with coverage
+        run: coverage run --omit keepsake_ui/main.py --source keepsake_ui -m pytest
+      - name: Display coverage
+        run: coverage report
