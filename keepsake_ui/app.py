@@ -4,7 +4,7 @@ import keepsake
 from keepsake.daemon import Daemon
 from functools import wraps
 from datetime import datetime, timedelta
-from flask import render_template, Blueprint, Flask
+from flask import render_template, Blueprint, Flask, redirect
 
 
 logger = logging.getLogger(__name__)
@@ -29,9 +29,6 @@ class Project(keepsake.Project):
 
 
 def setup_keepsake_blueprint(project: Project):
-    # TODO: experiments - delete
-    # TODO: checkpoints - list, delete, download model
-
     bp = Blueprint("keepsake", __name__, template_folder="templates")
 
     def handle_error(fn):
@@ -53,25 +50,49 @@ def setup_keepsake_blueprint(project: Project):
     @handle_error
     def get_experiment(exp_id):
         exp = project.experiments.get(exp_id)
-        chkpoint = exp.best()
+        checkpoints = [
+            dict(id=ch.short_id(), created=ch.created, step=ch.step, metrics=ch.metrics)
+            for ch in exp.checkpoints
+        ]
+        all_metrics = sorted({m for ch in checkpoints for m in ch["metrics"]})
         context = dict(
             title="Experiment",
+            id=exp.id,
             short_id=exp.short_id(),
             created=exp.created.isoformat(),
             command=exp.command,
             params=sort_by_key(exp.params),
-            metrics=sort_by_key(chkpoint.metrics) if chkpoint else {},
+            checkpoints=checkpoints,
+            all_metrics=all_metrics,
         )
         return render_template("experiment.html", **context)
+
+    @bp.route("/experiments/<exp_id>/delete", methods=["GET"])
+    @handle_error
+    def delete_experiment(exp_id):
+        exp = project.experiments.get(exp_id)
+        exp.delete()
+        return redirect("/experiments")
 
     @bp.route("/experiments", methods=["GET"])
     @handle_error
     def list_experiments():
         experiments = project.experiments.list()
-        short_ids = sorted(
-            [(e.created.isoformat(), e.short_id()) for e in experiments], reverse=True
+        sorted_experiments = sorted(
+            [
+                dict(
+                    created=e.created.isoformat(),
+                    short_id=e.short_id(),
+                    id=e.id,
+                    user=e.user,
+                    duration=e.duration,
+                )
+                for e in experiments
+            ],
+            key=lambda x: x["created"],
+            reverse=True,
         )
-        return render_template("experiment_list.html", short_ids=short_ids)
+        return render_template("experiment_list.html", experiments=sorted_experiments)
 
     @bp.route("/error", methods=["GET"])
     def error():

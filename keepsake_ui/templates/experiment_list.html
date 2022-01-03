@@ -3,11 +3,35 @@
 {% block content %}
 
 <div class="container pull-left">
-    <ul>
-    {% for (created, id) in short_ids %}
-      <li class="mono"><a href={{"/experiments/" ~ id }}>{{id}}</a> {{created}}</li>
-    {% endfor %}
-    </ul>
+<table class="table">
+    <caption>Experiments</caption>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Created</th>
+            <th>User</th>
+            <th>Duration</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in experiments %}
+            <tr>
+                <td><a href={{"/experiments/" ~ e["id"] }}>{{e["short_id"]}}</a></td>
+                <td>{{ e["created"] }}</td>
+                <td>{{ e["user"] }}</td>
+                <td>{{ e["duration"] }}</td>
+                <td>
+                    <div title="Delete Experiment">
+                        <a href={{ "/experiments/" ~ e["id"] ~ "/delete" }}>
+                            <i class="bi bi-x-square-fill" style="color: #dc3545;"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 </div>
 
 {% endblock %}

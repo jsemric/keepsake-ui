@@ -2,34 +2,64 @@
 
 {% block content %}
 <div class="container pull-left">
-    <h2>Experiment: {{ short_id }}</h2>
-    <table class="table table-bordered">
-        <tr>
-            <th>Created</th>
-            <td>{{ created }}</td>
-        </tr>
-        <tr>
-            <th>Command</th>
-            <td>{{ command }}</td>
-        </tr>
-        <tr>
-            <th>Parameters</th>
-        </tr>
-        {% for k, v in params.items() %}
+    <div>
+        <a class="btn btn-outline-danger" href={{ "/experiments/" ~ id ~ "/delete" }}>
+            <i class="bi bi-x-square-fill" style="color: #dc3545;"></i>
+            Delete
+        </a>
+    </div>
+    <div>
+        <table class="table table-bordered">
+            <caption>Experiment: {{ short_id }}</caption>
             <tr>
-                <td>{{ k }}</td>
-                <td>{{ v }}</td>
+                <th>Created</th>
+                <td>{{ created }}</td>
             </tr>
-        {% endfor %}
-        <tr>
-            <th>Metrics</th>
-        </tr>
-        {% for k, v in  metrics.items() %}
             <tr>
-                <td>{{ k }}</td>
-                <td>{{ "%.2f"|format(v) }}</td>
+                <th>Command</th>
+                <td>{{ command }}</td>
             </tr>
-        {% endfor %}
-    </table>
+            <tr>
+                <th>Parameters</th>
+            </tr>
+            {% for k, v in params.items() %}
+                <tr>
+                    <td>{{ k }}</td>
+                    <td>{{ v }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div>
+        <table class="table">
+            <caption>Checkpoints</caption>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Created</th>
+                    <th>Step</th>
+                    {% for i in all_metrics %}
+                        <th>{{ i }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for ch in checkpoints %}
+                    <tr>
+                        <td>{{ ch["id"] }}</td>
+                        <td>{{ ch["created"] }}</td>
+                        <td>{{ ch["step"] }}</td>
+                        {% for i in all_metrics %}
+                            {% if i in ch["metrics"] %}
+                                <td>{{ "%.3f"|format(ch["metrics"][i]) }}</td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
