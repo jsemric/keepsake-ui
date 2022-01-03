@@ -77,18 +77,26 @@ def setup_keepsake_blueprint(project: Project):
     @bp.route("/experiments", methods=["GET"])
     @handle_error
     def list_experiments():
+        def extract_experiment_data(exp):
+            best = exp.best()
+            if best:
+                primary_metric = best.primary_metric.get("name")
+                score = best.metrics.get(primary_metric)
+            else:
+                primary_metric = score = None
+            return dict(
+                created=exp.created.isoformat(),
+                short_id=exp.short_id(),
+                id=exp.id,
+                user=exp.user,
+                duration=exp.duration,
+                primary_metric=primary_metric,
+                score=round(score, 3) if isinstance(score, float) else score,
+            )
+
         experiments = project.experiments.list()
         sorted_experiments = sorted(
-            [
-                dict(
-                    created=e.created.isoformat(),
-                    short_id=e.short_id(),
-                    id=e.id,
-                    user=e.user,
-                    duration=e.duration,
-                )
-                for e in experiments
-            ],
+            [extract_experiment_data(e) for e in experiments],
             key=lambda x: x["created"],
             reverse=True,
         )

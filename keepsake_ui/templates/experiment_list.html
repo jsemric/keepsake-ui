@@ -11,6 +11,8 @@
             <th>Created</th>
             <th>User</th>
             <th>Duration</th>
+            <th>Primary Metric</th>
+            <th>Score</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -21,6 +23,8 @@
                 <td>{{ e["created"] }}</td>
                 <td>{{ e["user"] }}</td>
                 <td>{{ e["duration"] }}</td>
+                <td>{{ e["primary_metric"] }}</td>
+                <td>{{ e["score"] }}</td>
                 <td>
                     <div title="Delete Experiment">
                         <a href={{ "/experiments/" ~ e["id"] ~ "/delete" }}>
