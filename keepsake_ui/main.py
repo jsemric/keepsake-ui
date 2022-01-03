@@ -1,4 +1,7 @@
 import argparse
+import threading
+import time
+import webbrowser
 from gunicorn.app.base import BaseApplication
 from keepsake_ui.app import setup_app
 
@@ -35,8 +38,16 @@ def parse_args():
         help=f"Address port bind (default {default_bind})",
         default=default_bind,
     )
+    parser.add_argument(
+        "--no-browser", action="store_true", help="If set do not open browser"
+    )
     parser.add_argument("-r", "--repository", type=str, help="Keepsake repository")
     return parser.parse_args()
+
+
+def open_browser(bind):
+    time.sleep(1)
+    webbrowser.open(bind)
 
 
 def main():
@@ -45,6 +56,8 @@ def main():
         "bind": args.bind,
         "workers": 1,
     }
+    if not args.no_browser:
+        threading.Thread(target=open_browser, args=(args.bind,), daemon=True).start()
     Application(setup_app(args.repository), options).run()
 
 
