@@ -1,62 +1,64 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container pull-left">
+<div class="container float-start">
     {% if not exp1 %}
     <div>
         <form action="/experiments/compare" method="get">
-            <div class="form-group">
-                <select name="exp1" id="exp1" class="form-select" aria-label="Experiment 1">
-                    {% for i in ids %}
-                        <option value={{ i }}>{{ i }}</option>
-                    {% endfor %}
-                </select>
-                <select name="exp2" id="exp2" class="form-select" aria-label="Experiment 2">
-                    {% for i in ids %}
-                        <option value={{ i }}>{{ i }}</option>
-                    {% endfor %}
-                </select>
+            <div class="mb-3">
+                <label for="exp1" class="form-label">Experiment 1</label>
+                <input class="form-control" list="explist" id="exp1" name="exp1" placeholder="Type to search."/>
             </div>
-            <button type="submit" class="btn btn-primary">Compare</button>
+            <div class="mb-3">
+                <label for="exp2" class="form-label">Experiment 2</label>
+                <input class="form-control" list="explist" id="exp2" name="exp2" placeholder="Type to search."/>
+            </div>
+            <datalist id="explist">
+                {% for i in ids %}
+                    <option value={{ i }}>{{ i }}</option>
+                {% endfor %}
+            </datalist>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Compare</button>
+            </div>
         </form>
     </div>
     {% else %}
     <div>
-        <table class="table table-bordered">
+        <table class="table table-bordered caption-top">
             <caption>Experiment Comparison</caption>
             <tbody>
-            <tr class="table-dark">
+            <tr>
                 <th>ID</th>
                 <td><a href={{ "/experiments/"~exp1["short_id"]}}>{{ exp1["short_id"] }}</a></td>
                 <td><a href={{ "/experiments/"~exp2["short_id"]}}>{{ exp2["short_id"] }}</a></td>
             </tr>
-            <tr class="table-light">
+            <tr>
                 <th>Command</th>
                 <td>{{ exp1["command"] }}</td>
                 <td>{{ exp2["command"] }}</td>
             </tr>
-            <tr class="table-light">
+            <tr>
                 <th>Created</th>
                 <td>{{ exp1["created"] }}</td>
                 <td>{{ exp2["created"] }}</td>
             </tr>
-            <tr class="table-light">
+            <tr>
                 <th>Parameters</th>
             </tr>
             {% for i in common_params %}
                 <tr>
-                    <th>{{ i }}</th>
+                    <td>{{ i }}</td>
                     <td>{{ exp1["params"].get(i, "") }}</td>
                     <td>{{ exp2["params"].get(i, "") }}</td>
                 </tr>
             {% endfor %}
-
-            <tr class="table-light">
+            <tr>
                 <th>Metrics</th>
             </tr>
             {% for i in common_metrics %}
                 <tr>
-                    <th>{{ i }}</th>
+                    <td>{{ i }}</td>
                     <td>{{ exp1["best_metrics"].get(i, "") }}</td>
                     <td>{{ exp2["best_metrics"].get(i, "") }}</td>
                 </tr>

@@ -1,20 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container pull-left">
+<div class="container float-start">
     <div>
-        <table class="table table-bordered">
+        <table class="table table-bordered caption-top">
             <caption>Experiment: {{ short_id }}</caption>
             <tbody>
-            <tr class="table-light">
+            <tr>
                 <th scope="row">Created</th>
                 <td>{{ created }}</td>
             </tr>
-            <tr class="table-light">
+            <tr>
                 <th scope="row">Command</th>
                 <td>{{ command }}</td>
             </tr>
-            <tr class="table-light">
+            <tr>
                 <th scope="row">Parameters</th>
             </tr>
             {% for k, v in params.items() %}
@@ -28,7 +28,7 @@
     </div>
 
     <div>
-        <table class="table">
+        <table class="table caption-top">
             <caption>Checkpoints</caption>
             <thead>
                 <tr>
