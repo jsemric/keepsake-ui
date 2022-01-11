@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container pull-left">
+    {% if not exp1 %}
+    <div>
+        <form action="/experiments/compare" method="get">
+            <div class="form-group">
+                <select name="exp1" id="exp1" class="form-select" aria-label="Experiment 1">
+                    {% for i in ids %}
+                        <option value={{ i }}>{{ i }}</option>
+                    {% endfor %}
+                </select>
+                <select name="exp2" id="exp2" class="form-select" aria-label="Experiment 2">
+                    {% for i in ids %}
+                        <option value={{ i }}>{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Compare</button>
+        </form>
+    </div>
+    {% else %}
+    <div>
+        <table class="table table-bordered">
+            <caption>Experiment Comparison</caption>
+            <tbody>
+            <tr class="table-dark">
+                <th>ID</th>
+                <td><a href={{ "/experiments/"~exp1["short_id"]}}>{{ exp1["short_id"] }}</a></td>
+                <td><a href={{ "/experiments/"~exp2["short_id"]}}>{{ exp2["short_id"] }}</a></td>
+            </tr>
+            <tr class="table-light">
+                <th>Command</th>
+                <td>{{ exp1["command"] }}</td>
+                <td>{{ exp2["command"] }}</td>
+            </tr>
+            <tr class="table-light">
+                <th>Created</th>
+                <td>{{ exp1["created"] }}</td>
+                <td>{{ exp2["created"] }}</td>
+            </tr>
+            <tr class="table-light">
+                <th>Parameters</th>
+            </tr>
+            {% for i in common_params %}
+                <tr>
+                    <th>{{ i }}</th>
+                    <td>{{ exp1["params"].get(i, "") }}</td>
+                    <td>{{ exp2["params"].get(i, "") }}</td>
+                </tr>
+            {% endfor %}
+
+            <tr class="table-light">
+                <th>Metrics</th>
+            </tr>
+            {% for i in common_metrics %}
+                <tr>
+                    <th>{{ i }}</th>
+                    <td>{{ exp1["best_metrics"].get(i, "") }}</td>
+                    <td>{{ exp2["best_metrics"].get(i, "") }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

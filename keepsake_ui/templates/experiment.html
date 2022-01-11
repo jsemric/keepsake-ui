@@ -3,24 +3,19 @@
 {% block content %}
 <div class="container pull-left">
     <div>
-        <a class="btn btn-outline-danger" href={{ "/experiments/" ~ id ~ "/delete" }}>
-            <i class="bi bi-x-square-fill" style="color: #dc3545;"></i>
-            Delete
-        </a>
-    </div>
-    <div>
         <table class="table table-bordered">
             <caption>Experiment: {{ short_id }}</caption>
-            <tr>
-                <th>Created</th>
+            <tbody>
+            <tr class="table-light">
+                <th scope="row">Created</th>
                 <td>{{ created }}</td>
             </tr>
-            <tr>
-                <th>Command</th>
+            <tr class="table-light">
+                <th scope="row">Command</th>
                 <td>{{ command }}</td>
             </tr>
-            <tr>
-                <th>Parameters</th>
+            <tr class="table-light">
+                <th scope="row">Parameters</th>
             </tr>
             {% for k, v in params.items() %}
                 <tr>
@@ -28,8 +23,10 @@
                     <td>{{ v }}</td>
                 </tr>
             {% endfor %}
+            </tbody>
         </table>
     </div>
+
     <div>
         <table class="table">
             <caption>Checkpoints</caption>
@@ -60,6 +57,12 @@
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+    <div>
+        <a class="btn btn-outline-danger" href={{ "/experiments/" ~ id ~ "/delete" }}>
+            <i class="bi bi-x-square-fill" style="color: #dc3545;"></i>
+            Delete
+        </a>
     </div>
 </div>
 {% endblock %}

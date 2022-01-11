@@ -48,6 +48,12 @@ def test_app(client, experiment):
     resp = client.get(f"/experiments/xxxxxx")
     assert resp.status_code == 404
 
+    resp = client.get(f"/experiments/compare")
+    assert resp.status_code == 200
+
+    resp = client.get(f"/experiments/compare?exp1={experiment}&exp2={experiment}")
+    assert resp.status_code == 200
+
     resp = client.get(f"/experiments/{experiment}/delete")
     assert resp.status_code == 302
 

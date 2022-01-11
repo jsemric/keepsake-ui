@@ -4,7 +4,7 @@ import keepsake
 from keepsake.daemon import Daemon
 from functools import wraps
 from datetime import datetime, timedelta
-from flask import render_template, Blueprint, Flask, redirect
+from flask import render_template, Blueprint, Flask, redirect, request
 
 
 logger = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ def setup_keepsake_blueprint(project: Project):
 
     @bp.route("/", methods=["GET"])
     def index():
-        return render_template("index.html")
+        return redirect("/experiments")
 
     @bp.route("/experiments/<exp_id>", methods=["GET"])
     @handle_error
@@ -77,23 +77,6 @@ def setup_keepsake_blueprint(project: Project):
     @bp.route("/experiments", methods=["GET"])
     @handle_error
     def list_experiments():
-        def extract_experiment_data(exp):
-            best = exp.best()
-            if best:
-                primary_metric = best.primary_metric.get("name")
-                score = best.metrics.get(primary_metric)
-            else:
-                primary_metric = score = None
-            return dict(
-                created=exp.created.isoformat(),
-                short_id=exp.short_id(),
-                id=exp.id,
-                user=exp.user,
-                duration=exp.duration,
-                primary_metric=primary_metric,
-                score=round(score, 3) if isinstance(score, float) else score,
-            )
-
         experiments = project.experiments.list()
         sorted_experiments = sorted(
             [extract_experiment_data(e) for e in experiments],
@@ -102,11 +85,70 @@ def setup_keepsake_blueprint(project: Project):
         )
         return render_template("experiment_list.html", experiments=sorted_experiments)
 
+    @bp.route("/experiments/compare", methods=["GET"])
+    @handle_error
+    def compare_experiments():
+        exp_id1 = request.args.get("exp1")
+        exp_id2 = request.args.get("exp2")
+        if exp_id1 is None or exp_id2 is None:
+            experiments = project.experiments.list()
+            ids = [e.short_id() for e in experiments]
+            return render_template("compare.html", ids=ids)
+        exp1 = project.experiments.get(exp_id1)
+        exp2 = project.experiments.get(exp_id2)
+        exp1_data = extract_experiment_data(exp1)
+        exp1_data["params"] = {
+            k: v
+            for k, v in exp1.params.items()
+            if k not in exp2.params or v != exp1.params[k]
+        }
+        exp2_data = extract_experiment_data(exp2)
+        exp2_data["params"] = {
+            k: v
+            for k, v in exp2.params.items()
+            if k not in exp1.params or v != exp2.params[k]
+        }
+        common_params = sorted(
+            set(exp1_data["params"].keys()) | set(exp2_data["params"].keys())
+        )
+        common_metrics = sorted(
+            set(exp1_data["best_metrics"].keys())
+            | set(exp2_data["best_metrics"].keys())
+        )
+        return render_template(
+            "compare.html",
+            exp1=exp1_data,
+            exp2=exp2_data,
+            common_params=common_params,
+            common_metrics=common_metrics,
+        )
+
     @bp.route("/error", methods=["GET"])
     def error():
         return render_template("error.html", message="Manually triggered error")
 
     return bp
+
+
+def extract_experiment_data(exp):
+    best = exp.best()
+    if best:
+        primary_metric = best.primary_metric.get("name")
+        score = best.metrics.get(primary_metric)
+        best_metrics = best.metrics
+    else:
+        primary_metric = score = None
+        best_metrics = exp.checkpoints[-1].metrics
+    return dict(
+        created=exp.created.isoformat(),
+        short_id=exp.short_id(),
+        id=exp.id,
+        user=exp.user,
+        duration=exp.duration,
+        primary_metric=primary_metric,
+        best_metrics=best_metrics,
+        score=round(score, 3) if isinstance(score, float) else score,
+    )
 
 
 def sort_by_key(d):
@@ -124,3 +166,12 @@ def setup_app(repository):
     bp = setup_keepsake_blueprint(project)
     server.register_blueprint(bp)
     return server
+
+
+if __name__ == "__main__":
+    import os
+
+    app_ = setup_app(os.getenv("REPO"))
+    app_.jinja_env.auto_reload = True
+    app_.config["TEMPLATES_AUTO_RELOAD"] = True
+    app_.run(debug=True)
