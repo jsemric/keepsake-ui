@@ -50,7 +50,8 @@ def setup_keepsake_blueprint(project: Project):
     @handle_error
     def get_experiment(exp_id):
         exp = project.experiments.get(exp_id)
-        best_id = exp.best().id
+        best = exp.best()
+        best_id = best.id if best else None
         checkpoints = [
             dict(
                 id=ch.short_id(),
