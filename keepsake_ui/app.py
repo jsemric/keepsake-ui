@@ -50,8 +50,15 @@ def setup_keepsake_blueprint(project: Project):
     @handle_error
     def get_experiment(exp_id):
         exp = project.experiments.get(exp_id)
+        best_id = exp.best().id
         checkpoints = [
-            dict(id=ch.short_id(), created=ch.created, step=ch.step, metrics=ch.metrics)
+            dict(
+                id=ch.short_id(),
+                created=ch.created,
+                step=ch.step,
+                metrics=ch.metrics,
+                best=ch.id == best_id,
+            )
             for ch in exp.checkpoints
         ]
         all_metrics = sorted({m for ch in checkpoints for m in ch["metrics"]})

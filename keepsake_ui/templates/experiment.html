@@ -43,7 +43,11 @@
             <tbody>
                 {% for ch in checkpoints %}
                     <tr>
-                        <td>{{ ch["id"] }}</td>
+                        {% if ch["best"] %}
+                            <td>{{ ch["id"]~" (best)" }}</td>
+                        {% else %}
+                            <td>{{ ch["id"] }}</td>
+                        {% endif %}
                         <td>{{ ch["created"] }}</td>
                         <td>{{ ch["step"] }}</td>
                         {% for i in all_metrics %}
