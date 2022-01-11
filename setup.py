@@ -16,6 +16,7 @@ setup(
     version=__version__,
     description="Web UI to keepsake tool.",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Jakub Semric",
     author_email="jakubsemric@gmail.com",
     url="https://github.com/jsemric/keepsake-ui",
