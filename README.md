@@ -1,5 +1,7 @@
 # Keepsake UI
-Web UI to [keepsake](https://github.com/replicate/keepsake) versioning tool.
+Out of the box web UI to visualize machine learning experiments versioned
+by [keepsake](https://github.com/replicate/keepsake). Supports listing experiments,
+experiment deletion and comparison.
 
 ## Installation
 You can install the tool via pip

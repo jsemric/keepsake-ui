@@ -24,7 +24,7 @@ setup(
     ],
     package_dir={"keepsake_ui": "keepsake_ui"},
     include_package_data=True,
-    package_data={"": ["templates"]},
+    package_data={"": ["templates/*"]},
     install_requires=requirements,
     license="Apache License 2.0",
     python_requires=">=3.6.0",
